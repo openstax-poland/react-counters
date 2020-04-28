@@ -1,0 +1,27 @@
+{
+  "name": "react-counters",
+  "version": "0.1.0",
+  "description": "CSS counter in React",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/openstax-poland/react-counters",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/react": "^16.9.34",
+    "react": "^16.13.1",
+    "rollup": "^2.0.0",
+    "rollup-plugin-typescript2": "^0.27.0",
+    "typescript": "^3.7.4"
+  },
+  "peerDependencies": {
+    "react": "^16.13.1"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "prepare": "rollup -c"
+  }
+}
