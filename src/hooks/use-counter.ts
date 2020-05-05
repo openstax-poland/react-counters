@@ -18,7 +18,7 @@ import { getContext } from '../maps'
 export function useCounter(
     ref: React.RefObject<Node>,
     counter: Counter,
-    action?: Action,
+    action?: Action | number,
 ): number {
     const [value, setValue] = React.useState(0)
     const state = React.useContext(getContext(counter))
@@ -26,6 +26,8 @@ export function useCounter(
     React.useEffect(() => {
         if (action == null) {
             action = { type: 'increment', by: 1 }
+        } else if (typeof action === 'number') {
+            action = { type: 'increment', by: action }
         }
 
         return state.register(ref.current, setValue, action)
