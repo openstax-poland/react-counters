@@ -24,13 +24,13 @@ export function useCounter(
     const state = React.useContext(getContext(counter))
 
     React.useEffect(() => {
-        if (action == null) {
-            action = { type: 'increment', by: 1 }
-        } else if (typeof action === 'number') {
+        if (typeof action === 'number') {
             action = { type: 'increment', by: action }
         }
 
-        return state.register(ref.current, setValue, action)
+        return action == null
+            ? state.watch(ref.current, setValue)
+            : state.register(ref.current, setValue, action)
     }, [state, ref])
 
     return value

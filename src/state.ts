@@ -13,12 +13,14 @@ export type Unregister = () => void
 interface Registration {
     /** Registered node */
     node: Node
+    /** Is this node managed or merely observed? */
+    mode: 'managed' | 'observed'
     /** Functions to call when counter on this node changes */
     listeners: Notify[]
     /** Counter's current value at this node */
     value: number
     /** Action this node performs with a counter */
-    action: Action
+    action?: Action
 }
 
 export class State {
@@ -38,21 +40,55 @@ export class State {
      */
     public register(node: Node, notify: Notify, action: Action): Unregister {
         const inx = this.findNode(node)
+        const reg = this.nodes[inx]
 
-        if (inx < this.nodes.length && this.nodes[inx].node === node) {
-            throw new Error("attempted to register node a second time")
+        if (reg != null && reg.node === node) {
+            if (reg.mode === 'managed') {
+                throw new Error("attempted to register node a second time")
+            }
+
+            reg.mode = 'managed'
+            reg.listeners.push(notify)
+            reg.action = action
+        } else {
+            this.nodes.splice(inx, 0, {
+                node,
+                mode: 'managed',
+                listeners: [notify],
+                value: 0,
+                action,
+            })
         }
-
-        this.nodes.splice(inx, 0, {
-            node,
-            listeners: [notify],
-            value: 0,
-            action,
-        })
 
         this.update(inx)
 
         return this.unregister.bind(this, node)
+    }
+
+    /**
+     * Watch a node for changes to this counter
+     *
+     * This is similar to {@link register}, but watchers don't affect counter's
+     * value, and there may be multiple watchers registered for each node.
+     */
+    public watch(node: Node, notify: Notify): Unregister {
+        const inx = this.findNode(node)
+        const reg = this.nodes[inx]
+
+        if (reg != null && reg.node === node) {
+            reg.listeners.push(notify)
+            notify(reg.value)
+        } else {
+            this.nodes.splice(inx, 0, {
+                node,
+                mode: 'observed',
+                listeners: [notify],
+                value: 0,
+            })
+            this.update(inx)
+        }
+
+        return this.unwatch.bind(this, node, notify)
     }
 
     /** Remove an existing registration */
@@ -60,6 +96,20 @@ export class State {
         const index = this.nodes.findIndex(r => r.node === node)
         this.nodes.splice(index, 1)
         this.update(index)
+    }
+
+    /** Remove listener from a registration */
+    private unwatch(node: Node, notify: Notify) {
+        const index = this.nodes.findIndex(r => r.node === node)
+        const reg = this.nodes[index]
+
+        if (reg.mode === 'observed' && reg.listeners.length === 1) {
+            this.nodes.splice(index, 1)
+            return
+        }
+
+        const i2 = reg.listeners.findIndex(l => l === notify)
+        reg.listeners.splice(i2, 1)
     }
 
     /** Update counters for all nodes starting at an index */
@@ -71,9 +121,11 @@ export class State {
         for (let inx = start ; inx < this.nodes.length ; ++inx) {
             const node = this.nodes[inx]
 
-            switch (node.action.type) {
-            case 'increment': value += node.action.by; break
-            case 'set': value = node.action.value; break
+            if (node.action != null) {
+                switch (node.action.type) {
+                case 'increment': value += node.action.by; break
+                case 'set': value = node.action.value; break
+                }
             }
 
             // PERF: if value at this node didn't change then it also can't
