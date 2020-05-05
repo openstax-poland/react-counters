@@ -4,7 +4,7 @@
 
 import * as React from 'react'
 
-import { Counter } from '../interfaces'
+import { Action, Counter } from '../interfaces'
 import { getContext } from '../maps'
 
 /**
@@ -12,15 +12,23 @@ import { getContext } from '../maps'
  *
  * The node on which counters will be processed is specified by ref.
  *
- * This hook performs operation equivalent to CSS directive counter-increment,
- * and returns a number which CSS function counter() would use for formatting.
+ * This hook performs specified action, and returns a number which CSS function
+ * counter() would use for formatting.
  */
-export function useCounter(ref: React.RefObject<Node>, counter: Counter): number {
+export function useCounter(
+    ref: React.RefObject<Node>,
+    counter: Counter,
+    action?: Action,
+): number {
     const [value, setValue] = React.useState(0)
     const state = React.useContext(getContext(counter))
 
     React.useEffect(() => {
-        return state.register(ref.current, setValue)
+        if (action == null) {
+            action = { type: 'increment', by: 1 }
+        }
+
+        return state.register(ref.current, setValue, action)
     }, [state, ref])
 
     return value

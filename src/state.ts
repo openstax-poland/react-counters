@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for
 // full license text.
 
+import { Action } from './interfaces'
+
 /** Function called when value of a counter changes for a registered node */
 export type Notify = (value: number) => void
 
@@ -13,6 +15,10 @@ interface Registration {
     node: Node
     /** Functions to call when counter on this node changes */
     listeners: Notify[]
+    /** Counter's current value at this node */
+    value: number
+    /** Action this node performs with a counter */
+    action: Action
 }
 
 export class State {
@@ -30,7 +36,7 @@ export class State {
      * The returned function can be later used to unregister the node. For each
      * node there can only be a single registration at a time.
      */
-    public register(node: Node, notify: Notify): Unregister {
+    public register(node: Node, notify: Notify, action: Action): Unregister {
         const inx = this.findNode(node)
 
         if (inx < this.nodes.length && this.nodes[inx].node === node) {
@@ -40,6 +46,8 @@ export class State {
         this.nodes.splice(inx, 0, {
             node,
             listeners: [notify],
+            value: 0,
+            action,
         })
 
         this.update(inx)
@@ -56,9 +64,28 @@ export class State {
 
     /** Update counters for all nodes starting at an index */
     private update(start: number) {
-        for (; start < this.nodes.length ; ++start) {
-            for (const notify of this.nodes[start].listeners) {
-                notify(start + 1)
+        let value = start > 0
+            ? this.nodes[start - 1].value
+            : 0
+
+        for (let inx = start ; inx < this.nodes.length ; ++inx) {
+            const node = this.nodes[inx]
+
+            switch (node.action.type) {
+            case 'increment': value += node.action.by; break
+            case 'set': value = node.action.value; break
+            }
+
+            // PERF: if value at this node didn't change then it also can't
+            // change at any further node, as only the start node was modified.
+            if (value === node.value) {
+                break
+            }
+
+            node.value = value
+
+            for (const notify of node.listeners) {
+                notify(value)
             }
         }
     }
