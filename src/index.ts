@@ -3,5 +3,6 @@
 // full license text.
 
 export * from './hooks/use-counter'
+export * from './hooks/use-target-counter'
 export { createCounter } from './context'
 export { Counter } from './interfaces'
