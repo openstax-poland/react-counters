@@ -4,34 +4,77 @@
 
 import * as React from 'react'
 
-import { Action, Counter } from '../interfaces'
-import { getContext } from '../maps'
+import { Counter } from '../interfaces'
+import * as Observer from '../observer'
+
+/** Actions which can be performed on counters of a node */
+export interface Actions {
+    /**
+     * Reset counter's value
+     *
+     * This corresponds to CSS property counter-reset.
+     */
+    reset?: Action[]
+    /**
+     * Increment counter's value
+     *
+     * This corresponds to CSS property counter-increment.
+     */
+    increment?: Action[]
+    /**
+     * Set counter's value
+     *
+     * This corresponds to CSS property counter-set.
+     */
+    set?: Action[]
+}
+
+export type Action = [Counter, number] | Counter
 
 /**
- * Get current value of a counter on a node.
+ * Perform actions on counters of a node
  *
  * The node on which counters will be processed is specified by ref.
- *
- * This hook performs specified action, and returns a number which CSS function
- * counter() would use for formatting.
  */
 export function useCounter(
     ref: React.RefObject<Node>,
-    counter: Counter,
-    action?: Action | number,
-): number {
-    const [value, setValue] = React.useState(0)
-    const state = React.useContext(getContext(counter))
+    actions: Partial<Actions>,
+): void {
+    const compiledActions = React.useMemo(() => compileActions(actions), [actions])
 
     React.useEffect(() => {
-        if (typeof action === 'number') {
-            action = { type: 'increment', by: action }
+        Observer.setActions(ref.current, compiledActions)
+    }, [ref, actions])
+}
+
+const TYPES: (keyof Actions)[] = ['reset', 'increment', 'set']
+
+function compileActions(src: Actions): Observer.Actions {
+    const actions = new Map()
+
+    for (const key of TYPES) {
+        if (src[key] == null) {
+            continue
         }
 
-        return action == null
-            ? state.watch(ref.current, setValue)
-            : state.register(ref.current, setValue, action)
-    }, [state, ref])
+        for (const action of src[key]) {
+            const [name, value] = action instanceof Array
+                ? action
+                : [action, key === 'increment' ? 1 : 0]
 
-    return value
+            let counter = actions.get(name)
+
+            if (counter == null) {
+                actions.set(name, counter = {})
+            }
+
+            if (counter[key] == null || key !== 'increment') {
+                counter[key] = value
+            } else {
+                counter[key] += value
+            }
+        }
+    }
+
+    return actions
 }
