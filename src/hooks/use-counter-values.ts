@@ -21,6 +21,9 @@ export function useCounterValues(
 ): number[] {
     const counters = useCounters(ref)
     const instances = counters.get(counter) || []
+    const values = instances.map(i => i.value)
 
-    return instances.map(i => i.value)
+    React.useDebugValue(values)
+
+    return values
 }

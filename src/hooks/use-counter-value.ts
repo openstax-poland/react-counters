@@ -21,7 +21,11 @@ export function useCounterValue(
     const counters = useCounters(ref)
     const instances = counters.get(counter)
 
-    return instances == null
+    const value = instances == null
         ? 0
         : instances[instances.length - 1].value
+
+    React.useDebugValue(value)
+
+    return value
 }
