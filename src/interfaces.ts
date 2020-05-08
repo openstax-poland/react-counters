@@ -19,3 +19,14 @@ export function createCounter(options: {
 
     return Symbol(name ? `counter ${name}` : 'counter')
 }
+
+/** Current state of counters on a node */
+export type Instances = Map<Counter, Instance[]>
+
+/** Instance of a counter */
+export interface Instance {
+    /** Node which created this instance */
+    origin: Node
+    /** Current value */
+    value: number
+}

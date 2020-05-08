@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for
 // full license text.
 
-import { Counter } from './interfaces'
+import { Counter, Instances, Instance } from './interfaces'
 
 /** Roots of trees in which we maintain counter state */
 const ROOTS = new Map<Node, MutationObserver>()
@@ -13,25 +13,15 @@ const NODES = new WeakMap<Node, State>()
 /** Per-node data */
 interface State {
     /** Current state of counters on this node */
-    counters: Counters
+    counters: Instances
     /** Actions to perform on counters on this node */
     actions?: Actions
     /** Listeners to notify when counter values change */
     listeners: Notify[]
 }
 
-type Counters = Map<Counter, Instance[]>
-
-/** Instance of a counter */
-interface Instance {
-    /** Node which created this instance */
-    origin: Node
-    /** Current value */
-    value: number
-}
-
 /** Function called when state of counters on a node changes */
-export type Notify = (counters: Counters) => void
+export type Notify = (counters: Instances) => void
 
 /** Actions to perform on counters */
 export type Actions = Map<Counter, Action>
