@@ -83,13 +83,9 @@ export function trackRoot(node: Node): () => void {
  * Any previously set actions will be removed prior to setting these actions.
  */
 export function setActions(node: Node, actions: Actions) {
-    let state = NODES.get(node)
+    const state = getState(node)
 
-    if (state == null) {
-        NODES.set(node, state = { counters: new Map(), actions, listeners: [] })
-    } else {
-        state.actions = actions
-    }
+    state.actions = actions
 
     for (const root of ROOTS.keys()) {
         const p = root.compareDocumentPosition(node)
@@ -109,11 +105,7 @@ export function setActions(node: Node, actions: Actions) {
  * The returned function can be called to unregister the listener.
  */
 export function observe(node: Node, notify: Notify): () => void {
-    let state = NODES.get(node)
-
-    if (state == null) {
-        NODES.set(node, state = { counters: new Map(), listeners: [] })
-    }
+    const state = getState(node)
 
     state.listeners.push(notify)
 
@@ -171,7 +163,7 @@ function update(dirty: Node[]) {
             let changed = false
 
             if (state == null) {
-                NODES.set(node, state = { counters: new Map(), listeners: [] })
+                state = createState(node)
                 changed = true
             }
 
@@ -281,6 +273,27 @@ function update(dirty: Node[]) {
             dirty.shift()
         }
     }
+}
+
+/** Create new state for a node */
+function createState(node: Node): State {
+    const state: State = {
+        counters: new Map(),
+        listeners: [],
+    }
+
+    NODES.set(node, state)
+
+    return state
+}
+
+/** Get node's state, creating new one if necessary */
+function getState(node: Node): State {
+    const state = NODES.get(node)
+
+    return state != null
+        ? state
+        : createState(node)
 }
 
 /** Check two counter instance stacks for equality */
