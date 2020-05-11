@@ -31,6 +31,15 @@ export interface Actions {
 
 export type Action = [Counter, number] | Counter
 
+/** Actions which can be performed on counters of a node
+ *
+ * Properties inherited from {@link Actions} specify actions on the node itself,
+ * properties in before specify actions on a virtual ::before node.
+ */
+export interface ActionSpec extends Actions {
+    before?: Actions
+}
+
 /**
  * Perform actions on counters of a node
  *
@@ -38,12 +47,15 @@ export type Action = [Counter, number] | Counter
  */
 export function useCounter(
     ref: React.RefObject<Node>,
-    actions: Partial<Actions>,
+    actions: ActionSpec,
 ): void {
-    const compiledActions = React.useMemo(() => compileActions(actions), [actions])
+    const compiled = React.useMemo(() => ({
+        actions: compileActions(actions),
+        before: actions.before && compileActions(actions.before),
+    }), [actions])
 
     React.useEffect(() => {
-        Observer.setActions(ref.current, compiledActions)
+        Observer.setActions(ref.current, compiled.actions, compiled.before)
     }, [ref, actions])
 }
 

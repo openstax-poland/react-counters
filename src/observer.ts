@@ -2,7 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for
 // full license text.
 
-import { Counter, Instances, Instance } from './interfaces'
+import { Counter, Instances, Instance, Origin } from './interfaces'
+
+/** Symbol used to associate a node with it's virtual ::before child */
+const BEFORE = Symbol('::before')
 
 /** Roots of trees in which we maintain counter state */
 const ROOTS = new Map<Node, MutationObserver>()
@@ -13,11 +16,18 @@ const NODES = new WeakMap<Node, State>()
 /** Per-node data */
 interface State {
     /** Current state of counters on this node */
-    counters: Instances
-    /** Actions to perform on counters on this node */
-    actions?: Actions
+    counters: Counters
+    /** Counter state of the virtual ::before node */
+    before?: Counters
     /** Listeners to notify when counter values change */
     listeners: Notify[]
+}
+
+interface Counters {
+    /** Current state of counters on this node */
+    instances: Instances
+    /** Actions to perform on counters on this node */
+    actions?: Actions
 }
 
 /** Function called when state of counters on a node changes */
@@ -82,10 +92,16 @@ export function trackRoot(node: Node): () => void {
  *
  * Any previously set actions will be removed prior to setting these actions.
  */
-export function setActions(node: Node, actions: Actions) {
+export function setActions(node: Node, actions: Actions, before?: Actions) {
     const state = getState(node)
 
-    state.actions = actions
+    state.counters.actions = actions
+
+    if (before != null) {
+        state.before = { instances: new Map(), actions: before }
+    } else {
+        delete state.before
+    }
 
     for (const root of ROOTS.keys()) {
         const p = root.compareDocumentPosition(node)
@@ -109,7 +125,7 @@ export function observe(node: Node, notify: Notify): () => void {
 
     state.listeners.push(notify)
 
-    notify(state.counters)
+    notify(state.counters.instances)
 
     return () => {
         const inx = state.listeners.findIndex(n => n === notify)
@@ -170,17 +186,21 @@ function update(dirty: Node[]) {
             const counterSrc = getCounterSource(node)
             const valueSrc = getValueSource(node)
 
-            changed = processCounters(node, state, counterSrc, valueSrc) || changed
+            changed = processCounters(node, state.counters, counterSrc, valueSrc) || changed
+
+            if (changed) {
+                for (const notify of state.listeners) {
+                    notify(state.counters.instances)
+                }
+            }
+
+            changed = processBefore(node, state) || changed
 
             // PERF: if values of counters didn't change we don't need to spend
             // time notifying listeners (and potentially re-rendering parts of
             // the document).
             if (!changed) {
                 break
-            }
-
-            for (const notify of state.listeners) {
-                notify(state.counters)
             }
         }
 
@@ -193,10 +213,33 @@ function update(dirty: Node[]) {
     }
 }
 
+/** Process the ::before child of a node */
+function processBefore(node: Node, state: State): boolean {
+    // Node has no ::before child.
+    if (state.before == null) {
+        return false
+    }
+
+    // Node used to have a ::before child, but it was removed.
+    if (state.before.actions == null) {
+        delete state.before
+        return true
+    }
+
+    const before = BEFORE in node
+        ? (node as any)[BEFORE]
+        : (node as any)[BEFORE] = { before: node }
+
+    // Since ::before is always the first child node will be
+    // both its counter and value source.
+    const src = state.counters.instances
+    return processCounters(before, state.before, src, src)
+}
+
 /** Create new state for a node */
 function createState(node: Node): State {
     const state: State = {
-        counters: new Map(),
+        counters: { instances: new Map() },
         listeners: [],
     }
 
@@ -217,21 +260,35 @@ function getState(node: Node): State {
 /** Get counter source for a given node */
 function getCounterSource(node: Node): Instances {
     if (node.previousSibling != null) {
-        return getState(node.previousSibling).counters
+        return getState(node.previousSibling).counters.instances
     }
 
-    return getState(node.parentElement).counters
+    const parent = getState(node.parentElement)
+
+    return parent.before != null
+        ? parent.before.instances
+        : parent.counters.instances
 }
 
 /** Get counter value source for a given node */
 function getValueSource(node: Node): Instances {
-    return getState(prev(node)).counters
+    const p = prev(node)
+
+    if (p === node.parentElement) {
+        const parent = getState(p)
+
+        if (parent.before != null) {
+            return parent.before.instances
+        }
+    }
+
+    return getState(p).counters.instances
 }
 
 /** Process counters on a node */
 function processCounters(
-    node: Node,
-    state: State,
+    origin: Origin,
+    state: Counters,
     counterSrc: Instances,
     valueSrc: Instances,
 ): boolean {
@@ -277,18 +334,18 @@ function processCounters(
         let instances = counters.get(name)
 
         if (instances == null) {
-            instances = [{ origin: origin, value: 0 }]
+            instances = [{ origin, value: 0 }]
             counters.set(name, instances)
         }
 
         if (actions.reset != null) {
             const last = instances[instances.length - 1]
 
-            if (last.origin === origin || !isBefore && isSibling(last.origin, node)) {
+            if (last.origin === origin || !isBefore && isSibling(last.origin, origin)) {
                 instances.pop()
             }
 
-            instances.push({ origin: origin, value: actions.reset })
+            instances.push({ origin, value: actions.reset })
         }
 
         const last = instances[instances.length - 1]
@@ -304,23 +361,23 @@ function processCounters(
 
     // Check if there are any counters witch changed values.
     for (const [name, instances] of counters) {
-        const oldInstances = state.counters.get(name)
+        const oldInstances = state.instances.get(name)
 
         if (oldInstances == null
         || !compareInstances(instances, oldInstances)) {
             changed = true
         }
 
-        state.counters.delete(name)
+        state.instances.delete(name)
     }
 
     // Any counters left in the old states have been removed.
-    if (state.counters.size > 0) {
+    if (state.instances.size > 0) {
         changed = true
     }
 
     // Update state with new counter values.
-    state.counters = counters
+    state.instances = counters
 
     return changed
 }
@@ -378,8 +435,10 @@ function isBefore(a: Node, b: Node): boolean {
 }
 
 /** Return true if a is a sibling of b */
-function isSibling(a: Node, b: Node): boolean {
-    return a.parentElement === b.parentElement
+function isSibling(a: Node, b: Origin): boolean {
+    return b instanceof Node
+        ? a.parentElement === b.parentElement
+        : a.parentElement == b.node
 }
 
 /**
