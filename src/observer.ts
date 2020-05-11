@@ -171,10 +171,8 @@ function update(dirty: Node[]) {
 
             // Inherit counters.
 
-            const counterSrc = NODES.get(node.previousSibling || node.parentElement)
-                ?.counters || new Map()
-
-            const valueSrc = NODES.get(prev(node))?.counters  || new Map()
+            const counterSrc = getCounterSource(node)
+            const valueSrc = getValueSource(node)
 
             for (const [name, iv] of valueSrc) {
                 const ic = counterSrc.get(name)
@@ -294,6 +292,20 @@ function getState(node: Node): State {
     return state != null
         ? state
         : createState(node)
+}
+
+/** Get counter source for a given node */
+function getCounterSource(node: Node): Instances {
+    if (node.previousSibling != null) {
+        return getState(node.previousSibling).counters
+    }
+
+    return getState(node.parentElement).counters
+}
+
+/** Get counter value source for a given node */
+function getValueSource(node: Node): Instances {
+    return getState(prev(node)).counters
 }
 
 /** Check two counter instance stacks for equality */
