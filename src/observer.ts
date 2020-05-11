@@ -167,90 +167,10 @@ function update(dirty: Node[]) {
                 changed = true
             }
 
-            const counters = new Map()
-
-            // Inherit counters.
-
             const counterSrc = getCounterSource(node)
             const valueSrc = getValueSource(node)
 
-            for (const [name, iv] of valueSrc) {
-                const ic = counterSrc.get(name)
-
-                if (ic == null) {
-                    continue
-                }
-
-                const instances: Instance[] = []
-                counters.set(name, instances)
-
-                for (let i = 0 ; i < iv.length && i < ic.length ; ++i) {
-                    if (iv[i].origin !== ic[i].origin) {
-                        break
-                    }
-
-                    instances.push({
-                        origin: iv[i].origin,
-                        value: iv[i].value,
-                    })
-                }
-            }
-
-            // Perform actions on counters. Since counters are independent,
-            // instead of performing each action separately for all counters
-            // (as it is described in CSS spec) we perform all actions for each
-            // counter. This way we can easily check whether value of a given
-            // counter instance has changed, and thus whether we can skip
-            // notifying listeners.
-
-            for (const [name, actions] of state.actions || []) {
-                let instances = counters.get(name)
-
-                if (instances == null) {
-                    instances = [{ origin: node, value: 0 }]
-                    counters.set(name, instances)
-                }
-
-                if (actions.reset != null) {
-                    const last = instances[instances.length - 1]
-
-                    if (last.origin === node || isSibling(last.origin, node)) {
-                        instances.pop()
-                    }
-
-                    instances.push({ origin: node, value: actions.reset })
-                }
-
-                const last = instances[instances.length - 1]
-
-                if (actions.increment != null) {
-                    last.value += actions.increment
-                }
-
-                if (actions.set != null) {
-                    last.value = actions.set
-                }
-            }
-
-            // Check if there are any counters witch changed values.
-            for (const [name, instances] of counters) {
-                const oldInstances = state.counters.get(name)
-
-                if (oldInstances == null
-                || !compareInstances(instances, oldInstances)) {
-                    changed = true
-                }
-
-                state.counters.delete(name)
-            }
-
-            // Any counters left in the old states have been removed.
-            if (state.counters.size > 0) {
-                changed = true
-            }
-
-            // Update state with new counter values.
-            state.counters = counters
+            changed = processCounters(node, state, counterSrc, valueSrc) || changed
 
             // PERF: if values of counters didn't change we don't need to spend
             // time notifying listeners (and potentially re-rendering parts of
@@ -306,6 +226,103 @@ function getCounterSource(node: Node): Instances {
 /** Get counter value source for a given node */
 function getValueSource(node: Node): Instances {
     return getState(prev(node)).counters
+}
+
+/** Process counters on a node */
+function processCounters(
+    node: Node,
+    state: State,
+    counterSrc: Instances,
+    valueSrc: Instances,
+): boolean {
+    const counters = new Map()
+
+    let changed = false
+
+    // Inherit counters.
+
+    for (const [name, iv] of valueSrc) {
+        const ic = counterSrc.get(name)
+
+        if (ic == null) {
+            continue
+        }
+
+        const instances: Instance[] = []
+
+        for (let i = 0; i < iv.length && i < ic.length; ++i) {
+            if (iv[i].origin !== ic[i].origin) {
+                break
+            }
+
+            instances.push({
+                origin: iv[i].origin,
+                value: iv[i].value,
+            })
+        }
+
+        if (instances.length > 0) {
+            counters.set(name, instances)
+        }
+    }
+
+    // Perform actions on counters. Since counters are independent,
+    // instead of performing each action separately for all counters
+    // (as it is described in CSS spec) we perform all actions for each
+    // counter. This way we can easily check whether value of a given
+    // counter instance has changed, and thus whether we can skip
+    // notifying listeners.
+
+    for (const [name, actions] of state.actions || []) {
+        let instances = counters.get(name)
+
+        if (instances == null) {
+            instances = [{ origin: origin, value: 0 }]
+            counters.set(name, instances)
+        }
+
+        if (actions.reset != null) {
+            const last = instances[instances.length - 1]
+
+            if (last.origin === origin || !isBefore && isSibling(last.origin, node)) {
+                instances.pop()
+            }
+
+            instances.push({ origin: origin, value: actions.reset })
+        }
+
+        const last = instances[instances.length - 1]
+
+        if (actions.increment != null) {
+            last.value += actions.increment
+        }
+
+        if (actions.set != null) {
+            last.value = actions.set
+        }
+    }
+
+    // Check if there are any counters witch changed values.
+    for (const [name, instances] of counters) {
+        const oldInstances = state.counters.get(name)
+
+        if (oldInstances == null
+        || !compareInstances(instances, oldInstances)) {
+            changed = true
+        }
+
+        state.counters.delete(name)
+    }
+
+    // Any counters left in the old states have been removed.
+    if (state.counters.size > 0) {
+        changed = true
+    }
+
+    // Update state with new counter values.
+    state.counters = counters
+
+    return changed
 }
 
 /** Check two counter instance stacks for equality */
