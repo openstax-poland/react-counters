@@ -857,7 +857,7 @@ const ethiopic_numeric = new Style({ system: new Ethiopic() })
 
 // -----------------------------------------------------------------------------
 
-export default {
+export const Styles = {
     armenian, bengali, cambodian, devanagari, georgian, gujarati, gurmukhi,
     hebrew, kannada, lao, malayalam, mongolian, myanmar, oriya, persian, tamil,
     telugu, thai, tibetan, hiragana, katakana, disc, circle, square,
@@ -889,3 +889,5 @@ export default {
     'trad-chinese-formal': trad_chinese_formal,
     'ethiopic-numeric': ethiopic_numeric,
 }
+
+export type StyleName = keyof typeof Styles

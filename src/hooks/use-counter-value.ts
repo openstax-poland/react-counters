@@ -5,8 +5,20 @@
 import * as React from 'react'
 
 import { Counter } from '../interfaces'
+import { Style, Styles, StyleName } from '../style'
 import * as Observer from '../observer'
 import { useCounters } from './use-counters'
+
+export function useCounterValue(
+    ref: Node | React.RefObject<Node>,
+    counter: Counter,
+): number
+
+export function useCounterValue(
+    ref: Node | React.RefObject<Node>,
+    counter: Counter,
+    style: Style | StyleName,
+): string
 
 /**
  * Get current value of a counter on a node
@@ -17,7 +29,8 @@ import { useCounters } from './use-counters'
 export function useCounterValue(
     ref: Node | React.RefObject<Node>,
     counter: Counter,
-): number {
+    style?: Style | StyleName,
+): number | string {
     const counters = useCounters(ref)
     const instances = counters.get(counter)
 
@@ -27,5 +40,7 @@ export function useCounterValue(
 
     React.useDebugValue(value)
 
-    return value
+    return style == null
+        ? value
+        : (typeof style === 'string' ? Styles[style] : style).format(value)
 }
