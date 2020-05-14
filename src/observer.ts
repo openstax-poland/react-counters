@@ -419,11 +419,13 @@ function next(node: Node, children: boolean = true): Node | null {
 /** Return previous node in document order */
 function prev(node: Node): Node {
     if (node.previousSibling != null) {
-        if (node.previousSibling.hasChildNodes()) {
-            return node.previousSibling.lastChild
+        let n = node.previousSibling
+
+        while (n.hasChildNodes()) {
+            n = n.lastChild
         }
 
-        return node.previousSibling
+        return n
     }
 
     return node.parentElement
