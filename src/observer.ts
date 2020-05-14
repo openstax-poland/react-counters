@@ -106,7 +106,7 @@ export function setActions(node: Node, actions: Actions, before?: Actions) {
     for (const root of ROOTS.keys()) {
         const p = root.compareDocumentPosition(node)
 
-        if (p & Node.DOCUMENT_POSITION_CONTAINS) {
+        if (root === node || p & Node.DOCUMENT_POSITION_CONTAINS) {
             return update([node])
         }
     }
