@@ -17,6 +17,7 @@
     "react": "^16.13.1",
     "rollup": "^2.0.0",
     "rollup-plugin-typescript2": "^0.27.0",
+    "tslib": "^2.0.0",
     "typescript": "^3.7.4"
   },
   "peerDependencies": {
@@ -24,6 +25,7 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "prepack": "rollup -c",
     "prepare": "rollup -c",
     "test": "rollup -c && mocha"
   }
