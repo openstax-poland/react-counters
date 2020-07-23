@@ -1,5 +1,5 @@
 const should = require('chai').should()
-const { Additive, Alphabetic, Cyclic, Fixed, Numeric, Style, Styles, Symbolic } = require('..')
+const { Additive, Alphabetic, Cyclic, Fixed, Numeric, Style, Styles, Symbolic } = require('../src')
 
 function testStyle(name, ...tests) {
     it(name, () => {
