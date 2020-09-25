@@ -207,7 +207,7 @@ function update(dirty: Node[]) {
         // PERF: Remove dirty nodes already processed when processing previous
         // dirty nodes.
         while (dirty.length > 0
-        && (isBefore(dirty[0], node) || dirty[0] === node)) {
+        && (node == null || isBefore(dirty[0], node) || dirty[0] === node)) {
             dirty.shift()
         }
     }
