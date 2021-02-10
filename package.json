@@ -12,7 +12,13 @@
   ],
   "devDependencies": {
     "@types/react": "16.9.34 - 17.x.x",
+    "@typescript-eslint/eslint-plugin": "^4.15.0",
+    "@typescript-eslint/parser": "^4.15.0",
     "chai": "^4.2.0",
+    "eslint": "^7.19.0",
+    "eslint-config-openstax-poland": "https://github.com/openstax-poland/eslint-config-openstax-poland.git",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.22.0",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
     "react": "16.13.0 - 17.x.x",
@@ -28,6 +34,7 @@
   "scripts": {
     "build": "rollup -c",
     "coverage": "nyc --reporter text --reporter html mocha",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src/ test/",
     "prepack": "rollup -c",
     "prepare": "rollup -c",
     "test": "mocha"
