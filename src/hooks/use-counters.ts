@@ -16,7 +16,7 @@ import { Instances } from '../interfaces'
 export function useCounters(ref: Node | React.RefObject<Node>): Instances {
     const [state, setState] = React.useState(new Map())
 
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         const node = ref == null
             ? null
             : ref instanceof Node

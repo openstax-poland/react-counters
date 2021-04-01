@@ -54,7 +54,7 @@ export function useCounter(
         before: actions.before && compileActions(actions.before),
     }), [actions])
 
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         Observer.setActions(ref.current, compiled.actions, compiled.before)
     }, [ref, actions])
 }
