@@ -5,8 +5,7 @@
 import * as React from 'react'
 
 import { Counter } from '../interfaces'
-import { Style, Styles, StyleName } from '../style'
-import * as Observer from '../observer'
+import { Style, StyleName, Styles } from '../style'
 import { useCounters } from './use-counters'
 
 export function useCounterValue(

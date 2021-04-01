@@ -1,16 +1,6 @@
 const should = require('chai').should()
 const { Additive, Alphabetic, Cyclic, Fixed, Numeric, Style, Styles, Symbolic } = require('../src')
 
-function testStyle(name, ...tests) {
-    it(name, () => {
-        const style = Styles[name]
-
-        for (const [number, output] of tests) {
-            style.format(number).should.eq(output)
-        }
-    })
-}
-
 describe('counters', () => {
     describe('systems', () => {
         it('cyclic', () => {

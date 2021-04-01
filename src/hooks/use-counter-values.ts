@@ -5,8 +5,7 @@
 import * as React from 'react'
 
 import { Counter } from '../interfaces'
-import { Style, Styles, StyleName } from '../style'
-import * as Observer from '../observer'
+import { Style, StyleName, Styles } from '../style'
 import { useCounters } from './use-counters'
 
 export function useCounterValues(
@@ -32,7 +31,7 @@ export function useCounterValues(
     ref: Node | React.RefObject<Node>,
     counter: Counter,
     style?: Style | StyleName,
-    separator?: string
+    separator?: string,
 ): number[] | string {
     const counters = useCounters(ref)
     const instances = counters.get(counter) || []

@@ -9,19 +9,19 @@ let FALLBACK: Style = null
  */
 export class Style {
     /** System to use to format a single number */
-    readonly system: System
+    public readonly system: System
 
     /** Value to prefix and suffix to a formatted number when it is negative */
-    readonly negative: NegativeSymbol
+    public readonly negative: NegativeSymbol
 
     /** Limit on range of supported values */
-    readonly range: Range
+    public readonly range: Range
 
     /** Minimal length and padding of a formatted value */
-    readonly pad?: Pad
+    public readonly pad?: Pad
 
     /** Style to fall back to when value can't be formatted using this one */
-    readonly fallback: Style
+    public readonly fallback: Style
 
     /**
      * Create a new style
@@ -30,7 +30,7 @@ export class Style {
      * and passing it to {@link Style}'s constructor, designed to look closer
      * to CSS's {@code @counter-style} declaration.
      */
-    static create(
+    public static create(
         options: {
             negative?: string | NegativeSymbol,
             range?: Partial<Range>,
@@ -69,14 +69,14 @@ export class Style {
         return new Style({ ...options, system })
     }
 
-    constructor(
+    public constructor(
         options: {
             system: System,
             negative?: string | NegativeSymbol,
             range?: Partial<Range>,
             pad?: Pad,
             fallback?: Style,
-        }
+        },
     ) {
         const { system, negative, range, pad, fallback } = options
 
@@ -95,12 +95,12 @@ export class Style {
     }
 
     /** Format a single number */
-    format(value: number): string
+    public format(value: number): string
 
     /** Format a full counter sequence using a separator */
-    format(value: number[], separator: string): string
+    public format(value: number[], separator: string): string
 
-    format(value: number | number[], separator: string = '.'): string {
+    public format(value: number | number[], separator = '.'): string {
         return typeof value === 'number'
             ? this.formatNumber(value)
             : this.formatNumbers(value, separator)
@@ -197,15 +197,17 @@ export type SystemOptions =
  * the beginning when it reaches the end of the list
  */
 export class Cyclic implements System {
-    readonly symbols: string[]
+    public readonly symbols: string[]
 
-    constructor(symbols: Iterable<string>) {
+    public constructor(symbols: Iterable<string>) {
         this.symbols = Array.from(symbols)
     }
 
-    get range() { return { min: -Infinity, max: Infinity } }
+    public get range(): Range {
+        return { min: -Infinity, max: Infinity }
+    }
 
-    format(number: number): string {
+    public format(number: number): string {
         return this.symbols[Math.abs((number - 1) % this.symbols.length)]
     }
 }
@@ -219,18 +221,20 @@ interface CyclicArgs {
  * System which runs through its list of counter symbols once, then falls back
  */
 export class Fixed implements System {
-    readonly symbols: string[]
+    public readonly symbols: string[]
 
-    constructor(
+    public constructor(
         symbols: Iterable<string>,
-        readonly firstValue: number = 1,
+        public readonly firstValue: number = 1,
     ) {
         this.symbols = Array.from(symbols)
     }
 
-    get range() { return { min: -Infinity, max: Infinity } }
+    public get range(): Range {
+        return { min: -Infinity, max: Infinity }
+    }
 
-    format(number: number): string {
+    public format(number: number): string {
         const index = number - this.firstValue
 
         return index >= this.symbols.length
@@ -253,15 +257,17 @@ interface FixedArgs {
  * back.
  */
 export class Symbolic implements System {
-    readonly symbols: string[]
+    public readonly symbols: string[]
 
-    constructor(symbols: Iterable<string>) {
+    public constructor(symbols: Iterable<string>) {
         this.symbols = Array.from(symbols)
     }
 
-    get range() { return { min: 1, max: Infinity } }
+    public get range(): Range {
+        return { min: 1, max: Infinity }
+    }
 
-    format(number: number): string {
+    public format(number: number): string {
         const index = (number - 1) % this.symbols.length
         const count = Math.ceil(number / this.symbols.length)
 
@@ -281,15 +287,17 @@ interface SymbolicArgs {
  * an alphabetic numbering system
  */
 export class Alphabetic implements System {
-    readonly symbols: string[]
+    public readonly symbols: string[]
 
-    constructor(symbols: Iterable<string>) {
+    public constructor(symbols: Iterable<string>) {
         this.symbols = Array.from(symbols)
     }
 
-    get range() { return { min: 1, max: Infinity } }
+    public get range(): Range {
+        return { min: 1, max: Infinity }
+    }
 
-    format(number: number): string {
+    public format(number: number): string {
         let result = ''
 
         while (number > 0) {
@@ -312,15 +320,17 @@ interface AlphabeticArgs {
  * "place-value" numbering system
  */
 export class Numeric implements System {
-    readonly symbols: string[]
+    public readonly symbols: string[]
 
-    constructor(symbols: Iterable<string>) {
+    public constructor(symbols: Iterable<string>) {
         this.symbols = Array.from(symbols)
     }
 
-    get range() { return { min: -Infinity, max: Infinity } }
+    public get range(): Range {
+        return { min: -Infinity, max: Infinity }
+    }
 
-    format(number: number): string {
+    public format(number: number): string {
         if (number === 0) {
             return this.symbols[0]
         }
@@ -343,15 +353,17 @@ interface NumericArgs {
 
 /** Sign-value numbering system */
 export class Additive implements System {
-    readonly symbols: [number, string][]
+    public readonly symbols: [number, string][]
 
-    constructor(symbols: Iterable<[number, string]>) {
+    public constructor(symbols: Iterable<[number, string]>) {
         this.symbols = Array.from(symbols)
     }
 
-    get range() { return { min: 0, max: Infinity } }
+    public get range(): Range {
+        return { min: 0, max: Infinity }
+    }
 
-    format(value: number): string {
+    public format(value: number): string {
         if (value === 0) {
             const [weight, symbol] = this.symbols[this.symbols.length - 1]
 
@@ -383,11 +395,12 @@ interface AdditiveArgs {
 }
 
 export class Chinese implements System {
-    readonly digits: string[]
-    readonly counters: { [key: number]: string }
+    public readonly digits: string[]
 
-    constructor(
-        readonly formal: boolean,
+    public readonly counters: { [key: number]: string }
+
+    public constructor(
+        public readonly formal: boolean,
         digits: Iterable<string>,
         counters: string | string[],
     ) {
@@ -395,9 +408,11 @@ export class Chinese implements System {
         this.counters = { 10: counters[0], 100: counters[1], 1000: counters[2] }
     }
 
-    get range() { return { min: -9999, max: 9999 } }
+    public get range(): Range {
+        return { min: -9999, max: 9999 }
+    }
 
-    format(number: number): string {
+    public format(number: number): string {
         if (number === 0) {
             return this.digits[0]
         }
@@ -439,11 +454,14 @@ export class Chinese implements System {
 }
 
 export class Ethiopic implements System {
-    static DIGITS: string[] = Array.from(' \u1369\u136a\u136b\u136c\u136d\u136e\u136f\u1370\u1371\u1372 \u1373\u1374\u1375\u1376\u1377\u1378\u1379\u137a')
+    /* eslint-disable-next-line max-len */
+    public static DIGITS: string[] = Array.from(' \u1369\u136a\u136b\u136c\u136d\u136e\u136f\u1370\u1371\u1372 \u1373\u1374\u1375\u1376\u1377\u1378\u1379\u137a')
 
-    get range() { return { min: 1, max: Infinity } }
+    public get range(): Range {
+        return { min: 1, max: Infinity }
+    }
 
-    format(number: number): string {
+    public format(number: number): string {
         if (number === 1) {
             return '\u1369'
         }
@@ -455,7 +473,9 @@ export class Ethiopic implements System {
             const tens = Math.floor(group / 10)
             const ones = group % 10
 
-            const skip = group === 0 || group === 1 && (number < 100 || inx % 2 === 1)
+            const skip = group === 0
+                || (group === 1 && number < 100)
+                || (group === 1 && inx % 2 === 1)
 
             let v = ''
 
@@ -498,6 +518,8 @@ function *zip<A, B>(a: Iterable<A>, b: Iterable<B>): Iterable<[A, B]> {
         yield [av.value, bv.value]
     }
 }
+
+/* eslint-disable array-element-newline, @typescript-eslint/naming-convention, max-len */
 
 // --- simple counter styles ---------------------------------------------------
 //
@@ -735,7 +757,7 @@ const JAPANESE_WEIGHTS = [9000, 8000, 7000, 6000, 5000, 4000, 3000, 2000, 1000,
     10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 
 const japanese = {
-    system: 'additive' as 'additive',
+    system: 'additive' as const,
     range: { min: -9999, max: 9999 },
     negative: '\u30DE\u30A4\u30CA\u30B9',
     fallback: cjk_decimal,
@@ -774,7 +796,7 @@ const KOREAN_WEIGHTS = [9000, 8000, 7000, 6000, 5000, 4000, 3000, 2000, 1000,
     10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 
 const korean = {
-    system: 'additive' as 'additive',
+    system: 'additive' as const,
     range: { min: -9999, max: 9999 },
     negative: '\uB9C8\uC774\uB108\uC2A4 ',
 }
@@ -865,8 +887,8 @@ export const Styles = {
     'decimal-leading-zero': decimal_leading_zero,
     'arabic-indic': arabic_indic,
     'upper-armenian': armenian,
-    'lower-armenian': armenian,
-    'khmer': cambodian,
+    'lower-armenian': lower_armenian,
+    khmer: cambodian,
     'cjk-decimal': cjk_decimal,
     'lower-roman': lower_roman,
     'upper-roman': upper_roman,
@@ -878,6 +900,7 @@ export const Styles = {
     'katakana-iroha': katakana_iroha,
     'cjk-earthly-branch': cjk_earthly_branch,
     'cjk-heavenly-stem': cjk_heavenly_stem,
+    'lower-greek': lower_greek,
     'japanese-formal': japanese_formal,
     'japanese-informal': japanese_informal,
     'korean-hangul-formal': korean_hangul_formal,

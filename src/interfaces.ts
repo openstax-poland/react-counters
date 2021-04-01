@@ -8,12 +8,13 @@
  * References to this interface should only be obtained from
  * {@link createCounter}.
  */
+/* eslint-disable-next-line @typescript-eslint/no-empty-interface */
 export interface Counter {
 }
 
 /** Create a new counter */
 export function createCounter(options: {
-    name?: string
+    name?: string,
 } = {}): Counter {
     const { name } = options
 

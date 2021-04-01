@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for
 // full license text.
 
-import { Counter, Instances, Instance, Origin } from './interfaces'
+import { Counter, Instance, Instances, Origin } from './interfaces'
 
 /** Symbol used to associate a node with it's virtual ::before child */
 const BEFORE = Symbol('::before')
@@ -92,7 +92,7 @@ export function trackRoot(node: Node): () => void {
  *
  * Any previously set actions will be removed prior to setting these actions.
  */
-export function setActions(node: Node, actions: Actions, before?: Actions) {
+export function setActions(node: Node, actions: Actions, before?: Actions): void {
     const state = getState(node)
 
     state.counters.actions = actions
@@ -207,6 +207,7 @@ function update(dirty: Node[]) {
         // PERF: Remove dirty nodes already processed when processing previous
         // dirty nodes.
         while (dirty.length > 0
+        /* eslint-disable-next-line no-unmodified-loop-condition */
         && (node == null || isBefore(dirty[0], node) || dirty[0] === node)) {
             dirty.shift()
         }
@@ -341,7 +342,7 @@ function processCounters(
         if (actions.reset != null) {
             const last = instances[instances.length - 1]
 
-            if (last.origin === origin || !isBefore && isSibling(last.origin, origin)) {
+            if (last.origin === origin || (!isBefore && isSibling(last.origin, origin))) {
                 instances.pop()
             }
 
@@ -398,7 +399,7 @@ function compareInstances(a: Instance[], b: Instance[]): boolean {
 }
 
 /** Return next node in document order */
-function next(node: Node, children: boolean = true): Node | null {
+function next(node: Node, children = true): Node | null {
     if (children && node.hasChildNodes()) {
         return node.firstChild
     }
@@ -433,14 +434,14 @@ function prev(node: Node): Node {
 
 /** Return true if a is before b in document order */
 function isBefore(a: Node, b: Node): boolean {
-    return (b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_PRECEDING) != 0
+    return (b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_PRECEDING) !== 0
 }
 
 /** Return true if a is a sibling of b */
 function isSibling(a: Node, b: Origin): boolean {
     return b instanceof Node
         ? a.parentElement === b.parentElement
-        : a.parentElement == b.node
+        : a.parentElement === b.node
 }
 
 /**
@@ -452,9 +453,9 @@ function isSibling(a: Node, b: Origin): boolean {
 function compareNodePositions(a: Node, b: Node): number {
     const p = b.compareDocumentPosition(a)
 
-    return (p & Node.DOCUMENT_POSITION_PRECEDING) != 0
+    return (p & Node.DOCUMENT_POSITION_PRECEDING) !== 0
         ? -1
-        : (p & Node.DOCUMENT_POSITION_FOLLOWING) != 0
+        : (p & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
             ? 1
             : 0
 }

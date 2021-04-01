@@ -31,7 +31,8 @@ export interface Actions {
 
 export type Action = [Counter, number] | Counter
 
-/** Actions which can be performed on counters of a node
+/**
+ * Actions which can be performed on counters of a node
  *
  * Properties inherited from {@link Actions} specify actions on the node itself,
  * properties in before specify actions on a virtual ::before node.

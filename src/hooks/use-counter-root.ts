@@ -7,8 +7,6 @@ import * as React from 'react'
 import * as Observer from '../observer'
 
 /** Mark element referenced by the ref as a counter root */
-export function useCounterRoot(ref: React.RefObject<HTMLElement>) {
-    React.useLayoutEffect(() => {
-        return Observer.trackRoot(ref.current)
-    }, [ref])
+export function useCounterRoot(ref: React.RefObject<HTMLElement>): void {
+    React.useLayoutEffect(() => Observer.trackRoot(ref.current), [ref])
 }
