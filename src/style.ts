@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for
 // full license text.
 
-let FALLBACK: Style = null
+let FALLBACK: Style
 
 /**
  * Representation of a counter style
@@ -125,7 +125,7 @@ export class Style {
 
             if (value < 0) {
                 length -= this.negative.prefix.length
-                    + this.negative.suffix?.length || 0
+                    + (this.negative.suffix?.length || 0)
             }
 
             if (length > 0) {
@@ -234,7 +234,7 @@ export class Fixed implements System {
         return { min: -Infinity, max: Infinity }
     }
 
-    public format(number: number): string {
+    public format(number: number): string | null {
         const index = number - this.firstValue
 
         return index >= this.symbols.length
@@ -267,7 +267,7 @@ export class Symbolic implements System {
         return { min: 1, max: Infinity }
     }
 
-    public format(number: number): string {
+    public format(number: number): string | null {
         const index = (number - 1) % this.symbols.length
         const count = Math.ceil(number / this.symbols.length)
 
@@ -363,7 +363,7 @@ export class Additive implements System {
         return { min: 0, max: Infinity }
     }
 
-    public format(value: number): string {
+    public format(value: number): string | null {
         if (value === 0) {
             const [weight, symbol] = this.symbols[this.symbols.length - 1]
 
@@ -531,7 +531,7 @@ function *zip<A, B>(a: Iterable<A>, b: Iterable<B>): Iterable<[A, B]> {
 FALLBACK = Style.create({
     system: 'numeric',
     symbols: '0123456789',
-    fallback: null as Style,
+    fallback: null as unknown as Style,
 })
 
 const decimal_leading_zero = new Style({

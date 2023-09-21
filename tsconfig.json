@@ -6,5 +6,6 @@
         "noImplicitAny": true,
         "jsx": "react",
         "moduleResolution": "node",
+        "strictNullChecks": true,
     },
 }

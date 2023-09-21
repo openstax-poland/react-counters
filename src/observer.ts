@@ -155,7 +155,8 @@ function onMutation(mutations: MutationRecord[]) {
         // more nodes than necessary in update(), but we won't miss any.
         if (mutation.removedNodes.length > 0) {
             if (mutation.previousSibling != null) {
-                dirty.add(next(mutation.previousSibling, false))
+                const node = next(mutation.previousSibling, false)
+                if (node != null) dirty.add(node)
             } else {
                 for (const node of mutation.target.childNodes) {
                     dirty.add(node)
@@ -172,7 +173,7 @@ function update(dirty: Node[]) {
     dirty.sort(compareNodePositions)
 
     while (dirty.length > 0) {
-        let node = dirty.shift()
+        let node: Node | null | undefined = dirty.shift()
 
         for (; node != null ; node = next(node)) {
             let state = NODES.get(node)
@@ -263,6 +264,8 @@ function getCounterSource(node: Node): Instances {
     if (node.previousSibling != null) {
         return getState(node.previousSibling).counters.instances
     }
+
+    if (node.parentElement == null) return new Map()
 
     const parent = getState(node.parentElement)
 
@@ -409,6 +412,7 @@ function next(node: Node, children = true): Node | null {
             return node.nextSibling
         }
 
+        if (node.parentElement == null) return null
         node = node.parentElement
 
         if (ROOTS.has(node)) {
@@ -423,13 +427,13 @@ function prev(node: Node): Node {
         let n = node.previousSibling
 
         while (n.hasChildNodes()) {
-            n = n.lastChild
+            n = n.lastChild!
         }
 
         return n
     }
 
-    return node.parentElement
+    return node.parentElement ?? node
 }
 
 /** Return true if a is before b in document order */

@@ -8,5 +8,9 @@ import * as Observer from '../observer'
 
 /** Mark element referenced by the ref as a counter root */
 export function useCounterRoot(ref: React.RefObject<HTMLElement>): void {
-    React.useLayoutEffect(() => Observer.trackRoot(ref.current), [ref])
+    React.useLayoutEffect(() => {
+        if (ref.current != null) {
+            Observer.trackRoot(ref.current)
+        }
+    }, [ref])
 }

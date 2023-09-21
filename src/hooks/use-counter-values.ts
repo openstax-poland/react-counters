@@ -31,7 +31,7 @@ export function useCounterValues(
     ref: Node | React.RefObject<Node>,
     counter: Counter,
     style?: Style | StyleName,
-    separator?: string,
+    separator: string = '.',
 ): number[] | string {
     const counters = useCounters(ref)
     const instances = counters.get(counter) || []

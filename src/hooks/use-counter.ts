@@ -56,7 +56,9 @@ export function useCounter(
     }), [actions])
 
     React.useLayoutEffect(() => {
-        Observer.setActions(ref.current, compiled.actions, compiled.before)
+        if (ref.current != null) {
+            Observer.setActions(ref.current, compiled.actions, compiled.before)
+        }
     }, [ref, actions])
 }
 
@@ -66,11 +68,13 @@ function compileActions(src: Actions): Observer.Actions {
     const actions = new Map()
 
     for (const key of TYPES) {
-        if (src[key] == null) {
+        const keyval = src[key]
+
+        if (keyval == null) {
             continue
         }
 
-        for (const action of src[key]) {
+        for (const action of keyval) {
             const [name, value] = action instanceof Array
                 ? action
                 : [action, key === 'increment' ? 1 : 0]
