@@ -39,5 +39,6 @@
     "prepack": "rollup -c",
     "prepare": "rollup -c",
     "test": "mocha"
-  }
+  },
+  "packageManager": "yarn@3.6.3"
 }
