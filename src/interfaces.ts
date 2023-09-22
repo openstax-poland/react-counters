@@ -8,7 +8,6 @@
  * References to this interface should only be obtained from
  * {@link createCounter}.
  */
-/* eslint-disable-next-line @typescript-eslint/no-empty-interface */
 export interface Counter {
 }
 

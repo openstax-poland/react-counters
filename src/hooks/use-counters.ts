@@ -14,7 +14,7 @@ import { Instances } from '../interfaces'
  * {@link useCounterValue} or {@link getCounterValues}.
  */
 export function useCounters(ref: Node | React.RefObject<Node>): Instances {
-    const [state, setState] = React.useState(new Map())
+    const [state, setState] = React.useState(new Map() as Instances)
 
     React.useLayoutEffect(() => {
         const node = ref == null

@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for
 // full license text.
 
+/* eslint-disable-next-line prefer-const -- false positive, const in this
+    location must be assigned at time of declaration */
 let FALLBACK: Style
 
 /**
@@ -87,11 +89,11 @@ export class Style {
                 ? { prefix: negative }
                 : negative
         this.range = {
-            min: range?.min || system.range.min,
-            max: range?.max || system.range.max,
+            min: range?.min ?? system.range.min,
+            max: range?.max ?? system.range.max,
         }
         this.pad = pad
-        this.fallback = fallback || FALLBACK
+        this.fallback = fallback ?? FALLBACK
     }
 
     /** Format a single number */
@@ -125,7 +127,7 @@ export class Style {
 
             if (value < 0) {
                 length -= this.negative.prefix.length
-                    + (this.negative.suffix?.length || 0)
+                    + (this.negative.suffix?.length ?? 0)
             }
 
             if (length > 0) {

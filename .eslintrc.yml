@@ -6,3 +6,7 @@ parserOptions:
   project: ./tsconfig.json
 
 extends: openstax-poland/typescript/style
+
+settings:
+  # Consider PnP-installed modules as external
+  import/external-module-folders: ["node_modules", ".yarn"]

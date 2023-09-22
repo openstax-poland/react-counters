@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for
 // full license text.
 
-import { Counter, Instance, Instances, Origin } from './interfaces'
+import { Before, Counter, Instance, Instances, Origin } from './interfaces'
 
 /** Symbol used to associate a node with it's virtual ::before child */
 const BEFORE = Symbol('::before')
@@ -228,9 +228,15 @@ function processBefore(node: Node, state: State): boolean {
         return true
     }
 
-    const before = BEFORE in node
+    /* eslint-disable @typescript-eslint/no-explicit-any,
+        @typescript-eslint/no-unsafe-assignment,
+        @typescript-eslint/no-unsafe-member-access */
+    const before: Before = BEFORE in node
         ? (node as any)[BEFORE]
         : (node as any)[BEFORE] = { before: node }
+    /* eslint-enable @typescript-eslint/no-explicit-any,
+        @typescript-eslint/no-unsafe-assignment,
+        @typescript-eslint/no-unsafe-member-access */
 
     // Since ::before is always the first child node will be
     // both its counter and value source.
@@ -296,7 +302,7 @@ function processCounters(
     counterSrc: Instances,
     valueSrc: Instances,
 ): boolean {
-    const counters = new Map()
+    const counters: Instances = new Map()
 
     let changed = false
 
@@ -334,7 +340,7 @@ function processCounters(
     // counter instance has changed, and thus whether we can skip
     // notifying listeners.
 
-    for (const [name, actions] of state.actions || []) {
+    for (const [name, actions] of state.actions ?? []) {
         let instances = counters.get(name)
 
         if (instances == null) {
@@ -345,7 +351,8 @@ function processCounters(
         if (actions.reset != null) {
             const last = instances[instances.length - 1]
 
-            if (last.origin === origin || (!isBefore && isSibling(last.origin, origin))) {
+            if (last.origin === origin
+            || (!isBefore(last.origin, origin) && isSibling(last.origin, origin))) {
                 instances.pop()
             }
 
@@ -437,15 +444,20 @@ function prev(node: Node): Node {
 }
 
 /** Return true if a is before b in document order */
-function isBefore(a: Node, b: Node): boolean {
-    return (b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_PRECEDING) !== 0
+function isBefore(a: Origin, b: Origin): boolean {
+    const an = unpackOrigin(a)
+    const bn = unpackOrigin(b)
+    return (bn.compareDocumentPosition(an) & Node.DOCUMENT_POSITION_PRECEDING) !== 0
 }
 
 /** Return true if a is a sibling of b */
-function isSibling(a: Node, b: Origin): boolean {
-    return b instanceof Node
-        ? a.parentElement === b.parentElement
-        : a.parentElement === b.node
+function isSibling(a: Origin, b: Origin): boolean {
+    const ref = b instanceof Node ? b.parentElement : b.node
+    return unpackOrigin(a).parentElement === ref
+}
+
+function unpackOrigin(origin: Origin): Node {
+    return origin instanceof Node ? origin : origin.node
 }
 
 /**

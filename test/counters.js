@@ -1,3 +1,4 @@
+/* eslint-disable import/no-commonjs */
 const should = require('chai').should()
 const { Additive, Alphabetic, Cyclic, Fixed, Numeric, Style, Styles, Symbolic } = require('../src')
 

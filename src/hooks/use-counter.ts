@@ -65,7 +65,7 @@ export function useCounter(
 const TYPES: (keyof Actions)[] = ['reset', 'increment', 'set']
 
 function compileActions(src: Actions): Observer.Actions {
-    const actions = new Map()
+    const actions: Observer.Actions = new Map()
 
     for (const key of TYPES) {
         const keyval = src[key]
@@ -88,7 +88,7 @@ function compileActions(src: Actions): Observer.Actions {
             if (counter[key] == null || key !== 'increment') {
                 counter[key] = value
             } else {
-                counter[key] += value
+                counter[key]! += value
             }
         }
     }
