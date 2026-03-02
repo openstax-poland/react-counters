@@ -18,29 +18,28 @@
     "@types/react": "16.9.34 - 19.x.x",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
-    "chai": "^6.2.2",
+    "@vitest/coverage-istanbul": "4.0.18",
     "eslint": "^9.39.3",
     "eslint-import-resolver-node": "^0.3.9",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "mocha": "^11.7.5",
-    "nyc": "^18.0.0",
     "react": "^19.2.4",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "react": "16.9.34 - 19.x.x"
   },
   "scripts": {
     "build": "rollup -c",
-    "coverage": "nyc --reporter text --reporter html mocha",
+    "coverage": "vitest --coverage",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src/ test/",
     "prepack": "rollup -c",
     "prepare": "rollup -c",
-    "test": "mocha"
+    "test": "vitest"
   },
   "packageManager": "yarn@4.12.0"
 }
