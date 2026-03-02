@@ -1,6 +1,6 @@
 {
   "name": "react-counters",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CSS counter in React",
   "type": "module",
   "module": "dist/index.js",
