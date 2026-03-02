@@ -148,6 +148,8 @@ export class Style {
 
     /** Format multiple numbers */
     private formatNumbers(value: number[], separator: string): string {
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-argument --
+            false positive? */
         return value.map(this.formatNumber.bind(this)).join(separator)
     }
 }
@@ -376,7 +378,7 @@ export class Additive implements System {
 
         let result = ''
 
-        for (let i = 0 ; i < this.symbols.length && value > 0 ; ++i) {
+        for (let i = 0; i < this.symbols.length && value > 0; ++i) {
             const [weight, symbol] = this.symbols[i]
             const count = Math.floor(value / weight)
             result += symbol.repeat(count)
@@ -430,10 +432,10 @@ export class Chinese implements System {
         }
 
         let result = ''
-        let mult = Math.pow(10, Math.floor(Math.log10(number)))
+        let mult = 10 ** Math.floor(Math.log10(number))
         let zero = false
 
-        for (; number > 0 ; number = number % mult, mult = Math.floor(mult / 10)) {
+        for (; number > 0; number = number % mult, mult = Math.floor(mult / 10)) {
             const digit = Math.floor(number / mult)
 
             if (digit === 0) {
@@ -456,7 +458,7 @@ export class Chinese implements System {
 }
 
 export class Ethiopic implements System {
-    /* eslint-disable-next-line max-len */
+    /* eslint-disable-next-line @stylistic/max-len */
     public static DIGITS: string[] = Array.from(' \u1369\u136a\u136b\u136c\u136d\u136e\u136f\u1370\u1371\u1372 \u1373\u1374\u1375\u1376\u1377\u1378\u1379\u137a')
 
     public get range(): Range {
@@ -470,7 +472,7 @@ export class Ethiopic implements System {
 
         let result = ''
 
-        for (let inx = 0 ; number > 0 ; ++inx, number = Math.floor(number / 100)) {
+        for (let inx = 0; number > 0; ++inx, number = Math.floor(number / 100)) {
             const group = number % 100
             const tens = Math.floor(group / 10)
             const ones = group % 10
@@ -521,7 +523,7 @@ function *zip<A, B>(a: Iterable<A>, b: Iterable<B>): Iterable<[A, B]> {
     }
 }
 
-/* eslint-disable array-element-newline, @typescript-eslint/naming-convention, max-len */
+/* eslint-disable @stylistic/array-element-newline, @stylistic/max-len */
 
 // --- simple counter styles ---------------------------------------------------
 //

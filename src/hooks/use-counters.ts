@@ -4,8 +4,8 @@
 
 import * as React from 'react'
 
-import * as Observer from '../observer'
 import { Instances } from '../interfaces'
+import * as Observer from '../observer'
 
 /**
  * Get current state of counter instances on a node

@@ -17,7 +17,7 @@ export function useCounterValues(
     ref: Node | React.RefObject<Node>,
     counter: Counter,
     style: Style | StyleName,
-    separator: string
+    separator: string,
 ): string
 
 /**
@@ -34,7 +34,7 @@ export function useCounterValues(
     separator: string = '.',
 ): number[] | string {
     const counters = useCounters(ref)
-    const instances = counters.get(counter) || []
+    const instances = counters.get(counter) ?? []
     const values = instances.map(i => i.value)
 
     React.useDebugValue(values)

@@ -2,8 +2,8 @@
   "name": "react-counters",
   "version": "0.1.0",
   "description": "CSS counter in React",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
+  "type": "module",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/openstax-poland/react-counters",
   "license": "MIT",
@@ -11,27 +11,28 @@
     "dist"
   ],
   "devDependencies": {
-    "@rollup/wasm-node": "^4.1.4",
-    "@types/node": "^20.8.9",
-    "@types/react": "16.9.34 - 17.x.x",
-    "@typescript-eslint/eslint-plugin": "^6.9.0",
-    "@typescript-eslint/parser": "^6.9.0",
-    "chai": "^4.3.10",
-    "eslint": "^8.52.0",
-    "eslint-config-openstax-poland": "openstax-poland/eslint-config-openstax-poland#gitpub/eslint-config-openstax-poland@0.4.0",
+    "@openstax-poland/eslint-config": "openstax-poland/eslint-config-openstax-poland#gitpub/@openstax-poland/eslint-config@0.7.0",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@rollup/wasm-node": "^4.59.0",
+    "@types/node": "^25.3.3",
+    "@types/react": "16.9.34 - 19.x.x",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "chai": "^6.2.2",
+    "eslint": "^9.39.3",
     "eslint-import-resolver-node": "^0.3.9",
-    "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-react": "^7.33.2",
-    "mocha": "^10.2.0",
-    "nyc": "^15.1.0",
-    "react": "16.13.0 - 17.x.x",
-    "rollup-plugin-typescript2": "^0.36.0",
-    "ts-node": "^10.9.1",
-    "tslib": "^2.6.2",
-    "typescript": "^5.2.2"
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "mocha": "^11.7.5",
+    "nyc": "^18.0.0",
+    "react": "^19.2.4",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "react": "^16.13.1"
+    "react": "16.9.34 - 19.x.x"
   },
   "scripts": {
     "build": "rollup -c",
@@ -41,5 +42,5 @@
     "prepare": "rollup -c",
     "test": "mocha"
   },
-  "packageManager": "yarn@4.0.0"
+  "packageManager": "yarn@4.12.0"
 }

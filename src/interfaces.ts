@@ -8,8 +8,7 @@
  * References to this interface should only be obtained from
  * {@link createCounter}.
  */
-export interface Counter {
-}
+export type Counter = symbol
 
 /** Create a new counter */
 export function createCounter(options: {

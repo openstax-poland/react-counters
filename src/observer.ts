@@ -175,7 +175,7 @@ function update(dirty: Node[]) {
     while (dirty.length > 0) {
         let node: Node | null | undefined = dirty.shift()
 
-        for (; node != null ; node = next(node)) {
+        for (; node != null; node = next(node)) {
             let state = NODES.get(node)
             let changed = false
 
@@ -258,11 +258,7 @@ function createState(node: Node): State {
 
 /** Get node's state, creating new one if necessary */
 function getState(node: Node): State {
-    const state = NODES.get(node)
-
-    return state != null
-        ? state
-        : createState(node)
+    return NODES.get(node) ?? createState(node)
 }
 
 /** Get counter source for a given node */
@@ -399,7 +395,7 @@ function compareInstances(a: Instance[], b: Instance[]): boolean {
         return false
     }
 
-    for (let i = 0 ; i < a.length ; ++i) {
+    for (let i = 0; i < a.length; ++i) {
         if (a[i].origin !== b[i].origin || a[i].value !== b[i].value) {
             return false
         }
