@@ -4,17 +4,17 @@
 
 import * as React from 'react'
 
-import { Counter } from '../interfaces'
-import { Style, StyleName, Styles } from '../style'
+import { type Counter } from '../interfaces'
+import { type Style, type StyleName, Styles } from '../style'
 import { useCounters } from './use-counters'
 
 export function useCounterValue(
-    ref: Node | React.RefObject<Node>,
+    ref: Node | React.RefObject<Node | null>,
     counter: Counter,
 ): number
 
 export function useCounterValue(
-    ref: Node | React.RefObject<Node>,
+    ref: Node | React.RefObject<Node | null>,
     counter: Counter,
     style: Style | StyleName,
 ): string
@@ -26,7 +26,7 @@ export function useCounterValue(
  * being that it returns counter's value rather than a formatted string.
  */
 export function useCounterValue(
-    ref: Node | React.RefObject<Node>,
+    ref: Node | React.RefObject<Node | null>,
     counter: Counter,
     style?: Style | StyleName,
 ): number | string {

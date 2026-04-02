@@ -4,7 +4,7 @@
 
 import * as React from 'react'
 
-import { Instances } from '../interfaces'
+import type { Instances } from '../interfaces'
 import * as Observer from '../observer'
 
 /**
@@ -13,7 +13,7 @@ import * as Observer from '../observer'
  * This is a low level hook, you probably want to use either
  * {@link useCounterValue} or {@link getCounterValues}.
  */
-export function useCounters(ref: Node | React.RefObject<Node>): Instances {
+export function useCounters(ref: Node | React.RefObject<Node | null>): Instances {
     const [state, setState] = React.useState(new Map() as Instances)
 
     React.useLayoutEffect(() => {

@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        // Environment Settings
+        "module": "esnext",
+        "target": "esnext",
+
+        // Output
+        "noEmit": true,
+        "noErrorTruncation": true,
+
+        // Stricter Typechecking Options
+        "strict": true,
+        "exactOptionalPropertyTypes": true,
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "noUncheckedSideEffectImports": true,
+        "moduleDetection": "force",
+        "skipLibCheck": true,
+    },
+}

@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for
 // full license text.
 
-import { Before, Counter, Instance, Instances, Origin } from './interfaces'
+import type { Before, Counter, Instance, Instances, Origin } from './interfaces'
 
 /** Symbol used to associate a node with it's virtual ::before child */
 const BEFORE = Symbol('::before')

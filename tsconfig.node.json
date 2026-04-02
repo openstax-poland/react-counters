@@ -1,0 +1,19 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+
+        // File Layout
+        "rootDir": ".",
+
+        "lib": ["esnext"],
+        "types": ["node"],
+    },
+    "include": [
+        "eslint.config.mjs",
+        "tsdown.config.ts",
+        "vitest.config.ts",
+        "test",
+    ],
+    "exclude": ["src"],
+}

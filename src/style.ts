@@ -20,7 +20,7 @@ export class Style {
     public readonly range: Range
 
     /** Minimal length and padding of a formatted value */
-    public readonly pad?: Pad
+    public readonly pad: Pad | undefined
 
     /** Style to fall back to when value can't be formatted using this one */
     public readonly fallback: Style

@@ -4,7 +4,7 @@
 
 import * as React from 'react'
 
-import { Counter } from '../interfaces'
+import type { Counter } from '../interfaces'
 import * as Observer from '../observer'
 
 /** Actions which can be performed on counters of a node */
@@ -47,7 +47,7 @@ export interface ActionSpec extends Actions {
  * The node on which counters will be processed is specified by ref.
  */
 export function useCounter(
-    ref: React.RefObject<Node>,
+    ref: React.RefObject<Node | null>,
     actions: ActionSpec,
 ): void {
     const compiled = React.useMemo(() => ({
