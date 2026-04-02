@@ -1,0 +1,17 @@
+{
+  "name": "react-counters",
+  "version": "0.1.2",
+  "description": "CSS counter in React",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/openstax-poland/react-counters",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "react": "16.9.34 - 19.x.x"
+  },
+  "packageManager": "yarn@4.12.0"
+}
